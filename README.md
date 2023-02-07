@@ -21,10 +21,8 @@ C:\Your\Directory> shard thisFile.py thatOne.java someThing.log
 [Learn how to add a directory to PATH (Windows)](https://stackoverflow.com/a/44272417)
 
 ## Screenshots
-
-Background Image Credits: Copyright © Banana Republic images / Shutterstock
-
 ![Screenshot 2023-02-07 223252](https://user-images.githubusercontent.com/68178267/217322391-75335731-bf30-4952-8408-dd65d1f56469.png)
 ![Screenshot 2023-02-07 223315](https://user-images.githubusercontent.com/68178267/217322396-f63f3158-65f0-4f35-9460-eca6b6c5303d.png)
 ![Screenshot 2023-02-07 223321](https://user-images.githubusercontent.com/68178267/217322401-c650b924-89fb-4761-b625-77b4b2a435cd.png)
 
+Background Image Credits: Copyright © Banana Republic images / Shutterstock
