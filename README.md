@@ -2,7 +2,7 @@
   <img src="https://user-images.githubusercontent.com/68178267/217315894-94b674ba-8860-4461-96ec-53727bb57ff0.svg" height=96>
   <h1 align="center"> Shard </h1>
 </p>
-<p align='center'>A Windows Command Prompt styled Basic Text Editor</p>
+<p align='center'>A Terminal Styled Basic Text Editor</p>
 
 ## Features:
 - Terminal styled fonts and colors
