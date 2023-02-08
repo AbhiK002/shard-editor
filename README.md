@@ -8,6 +8,9 @@
 - Terminal styled fonts and colors
 - Window Transparency/Opacity setting
 - Pin Window to Top
+- Unlike Window's Notepad, Shard only has 1 main running process.  
+<img src="https://user-images.githubusercontent.com/68178267/217595462-46ca07df-554e-43f1-b2f3-bac783db0feb.png" height=300>
+
 - Open any plain text file in Shard using "Open With" after right clicking the file
 - Open any file(s) in Shard via the terminal  
 
