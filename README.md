@@ -9,7 +9,7 @@
 - Window Transparency/Opacity setting
 - Pin Window to Top
 - Unlike Window's Notepad, Shard only has 1 main running process.  
-<img src="https://user-images.githubusercontent.com/68178267/217595462-46ca07df-554e-43f1-b2f3-bac783db0feb.png" height=300>
+<img src="https://user-images.githubusercontent.com/68178267/217601027-5d59d17e-d3a5-4670-9bf2-fa7eda276ee0.png" height=340>
 
 - Open any plain text file in Shard using "Open With" after right clicking the file
 - Open any file(s) in Shard via the terminal  
