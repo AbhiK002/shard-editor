@@ -1,6 +1,6 @@
 """
 Shard - Windows terminal styled text editor
-Copyright (C) Abhineet Kelley, 2023
+made by Abhineet Kelley, 2023
 Released under MIT License
 """
 from pathlib import Path
