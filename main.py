@@ -229,7 +229,7 @@ class File:
     def bring_to_front(window: Tk | Toplevel):
         window.attributes('-topmost', True)
         window.focus_set()
-        window.after(200, lambda: [window.attributes('-topmost', False)])
+        window.after(100, lambda: [window.attributes('-topmost', False)])
 
     def toggle_pin_window_to_top(self):
         if self.pin_state.get() == "true":
@@ -322,7 +322,7 @@ class File:
         self.mainframe.columnconfigure(0, weight=1)
         self.mainframe.rowconfigure(0, weight=1)
 
-        self.editor = Text(self.mainframe, width=500, wrap=NONE)
+        self.editor = Text(self.mainframe, width=500, wrap=NONE, undo=True)
         self.editor.grid(row=0, column=0, sticky=NSEW)
         self.editor.bind("<KeyRelease>", lambda _: self.is_file_saved())
         self.editor.focus_set()
@@ -898,3 +898,4 @@ if __name__ == '__main__':
         shard.create_instance()
 
     shard.start()
+
