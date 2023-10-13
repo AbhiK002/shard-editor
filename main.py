@@ -3,21 +3,29 @@ Shard - Windows terminal styled text editor
 made by Abhineet Kelley, 2023
 Released under MIT License
 """
-from pathlib import Path
-from random import choice
-from tkinter import *
-from tkinter import filedialog
-from tkinter.font import Font
-from tkinter.messagebox import askyesno, showwarning, askyesnocancel, showerror
-
 import os
 import sys
 import time
+from pathlib import Path
+from random import choice
+
+from tkinter import *
+from tkinter import filedialog
+from tkinter.font import Font
+from tkinter.messagebox import showwarning, askyesnocancel, showerror
+
 
 application_name = "Shard"
 
 
 def resource_path(relative_path):
+    """
+    Absolute path to a resource, so that it can be
+    correctly displayed/used in the compiled exe file
+    made using pyinstaller
+    Shard uses this function to display the title bar icon
+    without the need of having the image file externally
+    """
     try:
         base_path = sys._MEIPASS
     except Exception:
@@ -28,58 +36,63 @@ def resource_path(relative_path):
 
 class Shard:
     active_instances = 0
+
     main_directory = Path.home() / "AppData" / "Local" / "ShardEditor"
+    shard_running_indicator = main_directory / "run"
+
+    settings_file = main_directory / "EditorSettings.txt"
+    save_location_file = main_directory / "LastSaveLocation.txt"
+    instance_queue_file = main_directory / "files.temp"
 
     def __init__(self):
         self.master = Tk()
-        self.master.title("Shard - Text Editor")
-        self.master.withdraw()
+        self.master.withdraw()  # Hides the main Tk window, the parent of all subsequent instances
 
-        Shard.main_directory.mkdir(parents=True, exist_ok=True)
-        self.foreign_instance_file = Shard.main_directory / 'files.temp'
-        self.foreign_instance_file.touch()
-        self.running_indicator = Shard.main_directory / "run"
+        Shard.main_directory.mkdir(parents=True, exist_ok=True)  # Create main directories if needed
+        self.instance_queue_file = Shard.instance_queue_file
+        self.instance_queue_file.touch()
+        self.shard_running_indicator = Shard.shard_running_indicator
 
-    def check_for_instances(self):
+    def close_shard_if_no_instances_running(self):
         if Shard.active_instances <= 0:
             self.master.destroy()
             print("no instances detected")
-            if self.running_indicator.exists():
-                self.running_indicator.rmdir()
+            if self.shard_running_indicator.exists():
+                self.shard_running_indicator.rmdir()
             sys.exit(0)
 
     def create_instance(self, filepath=None, main=False):
-        if self.running_indicator.exists() and not main:
+        if self.shard_running_indicator.exists() and not main:
             print("adding instance to file")
             self.add_instance_to_list(filepath)
         else:
             print("creating instance")
-            File(self.master, filepath) if filepath != "None" else File(self.master)
+            ShardInstance(self.master, filepath) if filepath != "None" else ShardInstance(self.master)
 
     def add_instance_to_list(self, path):
-        with open(self.foreign_instance_file, 'a') as file:
+        with open(self.instance_queue_file, 'a') as file:
             file.write(f"\n{path}")
             print("added", path)
 
     def open_instances_from_list(self):
-        with open(self.foreign_instance_file, 'r') as file:
+        with open(self.instance_queue_file, 'r') as file:
             foreign_files = file.read().strip().split('\n')
-        open(self.foreign_instance_file, 'w').close()
+        open(self.instance_queue_file, 'w').close()
 
         if foreign_files:
             [self.create_instance(ins, main=True) for ins in foreign_files if ins.strip() != '']
 
-        self.check_for_instances()
+        self.close_shard_if_no_instances_running()
         self.master.after(69, self.open_instances_from_list)
 
     def is_foreign_file_empty(self):
-        with open(self.foreign_instance_file) as file:
+        with open(self.instance_queue_file) as file:
             content = file.read().strip()
 
         return content == ''
 
     def start(self):
-        if self.running_indicator.exists():
+        if self.shard_running_indicator.exists():
             time.sleep(0.2)
             if not self.is_foreign_file_empty():
                 pass
@@ -89,13 +102,13 @@ class Shard:
                 return
 
         print("starting app")
-        self.running_indicator.mkdir(parents=True, exist_ok=True)
+        self.shard_running_indicator.mkdir(parents=True, exist_ok=True)
         self.open_instances_from_list()
 
         self.master.mainloop()
 
 
-class File:
+class ShardInstance:
     def __init__(self, master: Tk, filepath: Path | str | None = None):
         self.master = master
         self.root = Toplevel(master)
@@ -106,14 +119,15 @@ class File:
         self.filepath = Path(args[0]).resolve()  # by default the location of current directory
         self.new_file = True  # whether you opened a new, empty file
 
-        # Paths
+        # Main folder and file paths
         self.app_directory = Shard.main_directory
-        self.app_directory.mkdir(parents=True, exist_ok=True)
+        self.settings_file = Shard.settings_file
+        self.save_location_file = Shard.save_location_file
 
-        self.settings_file = self.app_directory / "EditorSettings.txt"
+        # Create main folders/files if they don't exist
+        self.app_directory.mkdir(parents=True, exist_ok=True)
         self.settings_file.touch()
-        self.saveloc_file = self.app_directory / "LastSaveLocation.txt"
-        self.saveloc_file.touch()
+        self.save_location_file.touch()
 
         # Allowed Values of Value Editors
         self.colors = sorted(["black", "white", "red", "silver", "gray", "yellow", "sky blue", "green", "lime", "blue", "coral", "bisque", "purple", "pink"])
@@ -181,8 +195,8 @@ class File:
     def get_last_save_location(self):
         self.app_directory.mkdir(parents=True, exist_ok=True)
 
-        self.saveloc_file.touch()
-        with open(self.saveloc_file) as file:
+        self.save_location_file.touch()
+        with open(self.save_location_file) as file:
             content = file.read().strip()
         if Path(content).exists() and Path(content).is_dir():
             return Path(content)
@@ -192,7 +206,7 @@ class File:
     def set_last_save_location(self, path):
         self.app_directory.mkdir(parents=True, exist_ok=True)
 
-        with open(self.saveloc_file, 'w') as file:
+        with open(self.save_location_file, 'w') as file:
             file.write(str(path))
 
     def get_editor_settings(self):
@@ -862,7 +876,7 @@ class File:
 
     # New Operation Related
     def start_new_file(self, filepath=None):
-        File(self.master, filepath)
+        ShardInstance(self.master, filepath)
 
     def close_instance(self):
         Shard.active_instances -= 1
@@ -874,6 +888,7 @@ class File:
             if self.new_file and self.editor.get("1.0", END).rstrip('\n') == '':
                 self.close_instance()
             else:
+                self.root.attributes('-topmost', False)
                 choice = askyesnocancel("File Unsaved", f"Do you want to save the file "
                                                         f"'{self.filename.get()}' before closing it?")
                 if choice == YES:
