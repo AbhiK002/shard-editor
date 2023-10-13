@@ -888,12 +888,18 @@ class ShardInstance:
             if self.new_file and self.editor.get("1.0", END).rstrip('\n') == '':
                 self.close_instance()
             else:
-                self.root.attributes('-topmost', False)
+                # if pinned
+                status = self.pin_state.get()
+                if status == "true":
+                    self.pin_toggle.invoke()
+                    
                 choice = askyesnocancel("File Unsaved", f"Do you want to save the file "
                                                         f"'{self.filename.get()}' before closing it?")
                 if choice == YES:
                     self.save_window(close_after_saving=True)
                 elif choice is None:
+                    if status == "true":
+                        self.pin_toggle.invoke()
                     return
                 else:
                     self.close_instance()
